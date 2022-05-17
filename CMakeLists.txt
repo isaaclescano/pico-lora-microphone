@@ -1,30 +1,46 @@
 cmake_minimum_required(VERSION 3.12)
 
-# Pull in SDK (must be before project)
+# initialize pico_sdk from GIT
+# (note this can come from environment, CMake cache etc)
+# set(PICO_SDK_FETCH_FROM_GIT on)
+
+# pico_sdk_import.cmake is a single file copied from this SDK
+# note: this must happen before project()
 include(pico_sdk_import.cmake)
 
-project(LoRa-RP2040 C CXX ASM)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+project(pico_microphone)
 
-set(PICO_LORA_PATH ${PROJECT_SOURCE_DIR})
-
-# Initialize the SDK
-set(PICO_CXX_ENABLE_EXCEPTIONS 1)
+# initialize the Pico SDK
 pico_sdk_init()
 
-include(example_auto_set_url.cmake)
+add_library(pico_pdm_microphone INTERFACE)
+
+target_sources(pico_pdm_microphone INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/src/pdm_microphone.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/OpenPDM2PCM/OpenPDMFilter.c
+)
+
+target_include_directories(pico_pdm_microphone INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/src/include
+)
+
+pico_generate_pio_header(pico_pdm_microphone ${CMAKE_CURRENT_LIST_DIR}/src/pdm_microphone.pio)
+
+target_link_libraries(pico_pdm_microphone INTERFACE pico_stdlib hardware_dma hardware_pio)
 
 
+add_library(pico_analog_microphone INTERFACE)
 
-add_subdirectory(src)
+target_sources(pico_analog_microphone INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/src/analog_microphone.c
+)
 
-# Hardware-specific examples in subdirectories:
-add_subdirectory(examples)
+target_include_directories(pico_analog_microphone INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/src/include
+)
 
-add_compile_options(-Wall
-        -Wno-format          # int != int32_t as far as the compiler is concerned because gcc has int32_t as long int
-        -Wno-unused-function # we have some for the docs that aren't called
-        -Wno-maybe-uninitialized
-        )
+target_link_libraries(pico_analog_microphone INTERFACE pico_stdlib hardware_adc hardware_dma)
 
+add_subdirectory("examples/hello_analog_microphone")
+add_subdirectory("examples/hello_pdm_microphone")
+add_subdirectory("examples/usb_microphone")

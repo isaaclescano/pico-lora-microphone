@@ -1,50 +1,77 @@
-# pico-lora
-LoRa communication library for Raspberry Pi RP2040 Microcontroller. 
+# Microphone Library for Pico
 
-This library is written for RP2040 C++ SDK.
+Capture audio from a microphone on your [Raspberry Pi Pico](https://www.raspberrypi.org/products/raspberry-pi-pico/) or any [RP2040](https://www.raspberrypi.org/products/rp2040/) based board. 🎤
 
-## Supported Hardware
- * RP2040 boards
-    * Raspberry Pi Pico
- * Semtech SX1276/77/78/79 based LoRa boards
+
+## Hardware
+
+ * RP2040 board
+   * [Raspberry Pi Pico](https://www.raspberrypi.org/products/raspberry-pi-pico/)
+ * Microphones
+   * Analog
+     * [Electret Microphone Amplifier - MAX9814 with Auto Gain Control](https://www.adafruit.com/product/1713) 
+   * PDM
+     * [Adafruit PDM MEMS Microphone Breakout](https://www.adafruit.com/product/3492)
 
 ### Default Pinout
 
-| Raspberry Pi Pico | Semtech SX1278 |
-| ----------------- | -------------- |
+#### Analog Microphone
+
+| Raspberry Pi Pico / RP2040 | Analog Microphone |
+| -------------------------- | ----------------- |
 | 3.3V | VCC |
 | GND | GND |
-| GPIO 18 | SCK |
-| GPIO 19 | MOSI |
-| GPIO 16 | MISO |
-| GPIO 7 | DIO0 / G0 |
-| GPIO 8 | NSS / CS |
-| GPIO 9 | RESET |
-| GPIO 10 | DIO1 / G1 |
+| GPIO 26 | OUT |
 
-Default Pinout can be overrided with setPins() function
+#### PDM Microphone
 
-## Installation
+| Raspberry Pi Pico / RP2040 | PDM Microphone |
+| -------------------------- | ----------------- |
+| 3.3V | VCC |
+| GND | GND |
+| GND | SEL |
+| GPIO 2 | DAT |
+| GPIO 3 | CLK |
 
-1. [Set up the Pico C/C++ SDK](https://github.com/raspberrypi/pico-sdk)
-2. Download module from git and open directory
+GPIO pins are configurable in examples or API.
+
+## Examples
+
+See [examples](examples/) folder.
+
+
+## Cloning
+
 ```sh
-git clone https://github.com/akshayabali/LoRa-pi-pico.git
-cd ./LoRa-RP2040
+git clone https://github.com/ArmDeveloperEcosystem/microphone-library-for-pico.git 
 ```
-3. Set `PICO_SDK_PATH`
+
+## Building
+
+1. [Set up the Pico C/C++ SDK](https://datasheets.raspberrypi.org/pico/getting-started-with-pico.pdf)
+2. Set `PICO_SDK_PATH`
 ```sh
-export PICO_SDK_PATH="path to pico-sdk"
+export PICO_SDK_PATH=/path/to/pico-sdk
 ```
-4. Create `build` directory then run `cmake` and `make`:
-```sh
+3. Create `build` dir, run `cmake` and `make`:
+```
 mkdir build
 cd build
-cmake ..
+cmake .. -DPICO_BOARD=pico
 make
 ```
-## Notes
-Currently this is only tested on Raspberry Pi Pico and Semtech1278 board. Feel free to reach out for any bugs or support.
+4. Copy example `.uf2` to Pico when in BOOT mode.
 
-## References
-This [project](https://github.com/akshayabali/LoRa-RP2040) is based on LoRa Library for Arduino:[sandeepmistry/arduino-LoRa](https://github.com/sandeepmistry/arduino-LoRa)
+## License
+
+[Apache-2.0 License](LICENSE)
+
+## Acknowledgements
+
+This project was created on behalf of the [Arm Software Developers](https://developer.arm.com/) team, follow them on Twitter: [@ArmSoftwareDev](https://twitter.com/armsoftwaredev) and YouTube: [Arm Software Developers](https://www.youtube.com/channel/UCHUAckhCfRom2EHDGxwhfOg) for more resources!
+
+The [OpenPDM2PCM](https://os.mbed.com/teams/ST/code/X_NUCLEO_CCA02M1//file/53f8b511f2a1/Middlewares/OpenPDM2PCM/) library is used to filter raw PDM data into PCM. The [TinyUSB](https://github.com/hathach/tinyusb) library is used in the `usb_microphone` example.
+
+---
+
+Disclaimer: This is not an official Arm product.
